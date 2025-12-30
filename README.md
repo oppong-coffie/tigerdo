@@ -1,50 +1,93 @@
-# Welcome to your Expo app 👋
+# Tigerdo - Security Guard App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Overview
 
-## Get started
+A mobile app for security guards to manage shifts, log activities, receive petrol reminders, and handle emergencies.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+### 🏠 Home (Shift Management)
 
-2. Start the app
+- **Start/End Shift** with geolocation check
+- **Activity Logging** (visitor entries, incidents, patrols)
+- **Petrol Reminders** every 30 minutes (works in background)
+- **Timeline View** of shift activities
 
-   ```bash
-   npx expo start
-   ```
+### 📜 History
 
-In the output, you'll find options to open the app in a
+- View past shift logs
+- Filter by date
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### ✅ Authorize
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **Manage authorized people** (name, description, phone)
+- **Manage authorized cars** (name, description, plate number)
+- Add/Delete functionality
 
-## Get a fresh project
+### 🚨 Emergency
 
-When you're ready, run:
+- **Emergency Contacts** (name, email, phone, position)
+- **📱 SOS SMS** - Send SMS to all contacts via smsnotifygh.com API
+- **📞 Call All** - Sequentially call each emergency contact
 
-```bash
-npm run reset-project
+### 👤 Profile
+
+- User information display
+
+---
+
+## Tech Stack
+
+- **Framework:** React Native + Expo
+- **Navigation:** expo-router
+- **Database:** Firebase Firestore
+- **Notifications:** expo-notifications
+- **SMS API:** smsnotifygh.com
+
+---
+
+## Configuration
+
+### Location (index.tsx)
+
+```javascript
+const TARGET_LOCATION = {
+  latitude: 5.6203491,
+  longitude: -0.1534685,
+};
+const ALLOWED_RADIUS_METERS = 100;
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Petrol Reminder Interval
 
-## Learn more
+```javascript
+const PETROL_REMINDER_INTERVAL_SECONDS = 1800; // 30 minutes
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### SMS API (emergency.tsx)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```javascript
+const SMS_API_KEY = "your-api-key";
+const SMS_SENDER_ID = "izone";
+```
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## Build Commands
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+# Development
+npx expo start --dev-client
+
+# Production Build
+npx eas-cli build --profile production --platform android
+```
+
+---
+
+## Firebase Collections
+
+- `logs` - Shift activity logs
+- `authorizedPeople` - Authorized visitors
+- `authorizedCars` - Authorized vehicles
+- `emergencyContacts` - Emergency contact list
