@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { db } from "../../firebaseConfig";
+import { auth, db } from "../../firebaseConfig";
 
 interface Log {
   id: string;
@@ -40,12 +40,29 @@ export default function History() {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
-    const q = query(collection(db, "logs"), orderBy("createdAt", "desc"));
+    const user = auth.currentUser;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, "logs"),
+      where("uid", "==", user.uid)
+    );
+    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedLogs = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Log[];
+
+      // Sort logs by createdAt descending in memory
+      fetchedLogs.sort((a: any, b: any) => {
+        const timeA = a.createdAt?.toDate?.()?.getTime() || 0;
+        const timeB = b.createdAt?.toDate?.()?.getTime() || 0;
+        return timeB - timeA;
+      });
 
       setAllLogs(fetchedLogs);
       updateSections(fetchedLogs, selectedDate);
@@ -116,7 +133,7 @@ export default function History() {
           minute: "2-digit",
           hour12: true,
         });
-        title = `Night Shift - ${dateStr}, ${timeStr}`;
+        title = `Shift - ${dateStr}, ${timeStr}`;
       } else if (shiftId !== "unassigned") {
         // Shift has ID but no start time found
         title = `Shift ${shiftId.replace("shift_", "").substring(0, 8)}...`;

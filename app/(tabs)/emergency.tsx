@@ -9,6 +9,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
@@ -22,7 +23,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { db } from "../../firebaseConfig";
+import { auth, db } from "../../firebaseConfig";
 
 interface EmergencyContact {
   id: string;
@@ -53,8 +54,15 @@ export default function Emergency() {
 
   // Subscribe to emergency contacts collection
   useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     const q = query(
       collection(db, "emergencyContacts"),
+      where("uid", "==", user.uid),
       orderBy("createdAt", "desc")
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -77,7 +85,11 @@ export default function Emergency() {
     }
 
     try {
+      const user = auth.currentUser;
+      if (!user) return;
+
       await addDoc(collection(db, "emergencyContacts"), {
+        uid: user.uid,
         name: name,
         email: email,
         phone: phone,

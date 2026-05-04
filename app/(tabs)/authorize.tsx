@@ -8,6 +8,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
@@ -21,7 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { db } from "../../firebaseConfig";
+import { auth, db } from "../../firebaseConfig";
 
 interface Person {
   id: string;
@@ -59,15 +60,29 @@ export default function Authorize() {
 
   // Subscribe to people collection
   useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     const q = query(
       collection(db, "authorizedPeople"),
-      orderBy("createdAt", "desc")
+      where("uid", "==", user.uid)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedPeople = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Person[];
+
+      // Sort by createdAt desc in memory to avoid needing a composite index
+      fetchedPeople.sort((a: any, b: any) => {
+        const timeA = a.createdAt?.toDate?.()?.getTime() || 0;
+        const timeB = b.createdAt?.toDate?.()?.getTime() || 0;
+        return timeB - timeA;
+      });
+
       setPeople(fetchedPeople);
       setLoading(false);
     });
@@ -77,15 +92,26 @@ export default function Authorize() {
 
   // Subscribe to cars collection
   useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
     const q = query(
       collection(db, "authorizedCars"),
-      orderBy("createdAt", "desc")
+      where("uid", "==", user.uid)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedCars = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Car[];
+
+      // Sort by createdAt desc in memory
+      fetchedCars.sort((a: any, b: any) => {
+        const timeA = a.createdAt?.toDate?.()?.getTime() || 0;
+        const timeB = b.createdAt?.toDate?.()?.getTime() || 0;
+        return timeB - timeA;
+      });
+
       setCars(fetchedCars);
     });
 
@@ -100,7 +126,11 @@ export default function Authorize() {
     }
 
     try {
+      const user = auth.currentUser;
+      if (!user) return;
+
       await addDoc(collection(db, "authorizedPeople"), {
+        uid: user.uid,
         name: personName,
         description: personDescription,
         number: personNumber,
@@ -126,7 +156,11 @@ export default function Authorize() {
     }
 
     try {
+      const user = auth.currentUser;
+      if (!user) return;
+
       await addDoc(collection(db, "authorizedCars"), {
+        uid: user.uid,
         name: carName,
         description: carDescription,
         number: carNumber,
@@ -290,18 +324,21 @@ export default function Authorize() {
             <TextInput
               style={styles.input}
               placeholder="Full Name"
+              placeholderTextColor="#A0AEC0"
               value={personName}
               onChangeText={setPersonName}
             />
             <TextInput
               style={styles.input}
               placeholder="Description (e.g. Brother, Friend)"
+              placeholderTextColor="#A0AEC0"
               value={personDescription}
               onChangeText={setPersonDescription}
             />
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
+              placeholderTextColor="#A0AEC0"
               value={personNumber}
               onChangeText={setPersonNumber}
               keyboardType="phone-pad"
@@ -338,18 +375,21 @@ export default function Authorize() {
             <TextInput
               style={styles.input}
               placeholder="Car Name"
+              placeholderTextColor="#A0AEC0"
               value={carName}
               onChangeText={setCarName}
             />
             <TextInput
               style={styles.input}
               placeholder="Description (e.g. White Toyota)"
+              placeholderTextColor="#A0AEC0"
               value={carDescription}
               onChangeText={setCarDescription}
             />
             <TextInput
               style={styles.input}
               placeholder="Car Number (e.g. GT-1234-21)"
+              placeholderTextColor="#A0AEC0"
               value={carNumber}
               onChangeText={setCarNumber}
             />

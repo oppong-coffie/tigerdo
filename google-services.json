@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "3661673529",
-    "project_id": "stallion-4d037",
-    "storage_bucket": "stallion-4d037.firebasestorage.app"
+    "project_number": "208387163535",
+    "project_id": "tigerdo-be3e5",
+    "storage_bucket": "tigerdo-be3e5.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:3661673529:android:1eb1d480e4a691968389e8",
+        "mobilesdk_app_id": "1:208387163535:android:a27fc3bf1f0ddde52977fa",
         "android_client_info": {
-          "package_name": "com.anonymous.sdo"
+          "package_name": "co.tigerdo"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCU5zLYwRYCGIvQYCLOu0dwFkYXVhGQJ7c"
+          "current_key": "AIzaSyAC1ziH47_xQ1Lh8yyN82bpXlV413KTSj8"
         }
       ],
       "services": {
