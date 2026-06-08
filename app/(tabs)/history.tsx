@@ -4,7 +4,6 @@ import { collection, onSnapshot, orderBy, query, where } from "firebase/firestor
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  SafeAreaView,
   SectionList,
   StatusBar,
   StyleSheet,
@@ -12,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaGuard } from "@/components/ui/safe-area-guard";
 import { auth, db } from "../../firebaseConfig";
 
 interface Log {
@@ -202,7 +202,7 @@ export default function History() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaGuard style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#F7FAFC" />
       <View style={styles.container}>
         <View style={styles.header}>
@@ -267,7 +267,7 @@ export default function History() {
           />
         )}
       </View>
-    </SafeAreaView>
+    </SafeAreaGuard>
   );
 }
 

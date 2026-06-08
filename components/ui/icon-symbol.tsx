@@ -19,6 +19,7 @@ const MAPPING: {
   "chevron.right": "chevron-right",
   "clock.fill": "history",
   "checkmark.shield.fill": "verified-user",
+  "exclamationmark.triangle.fill": "warning",
   "person.fill": "person",
 };
 

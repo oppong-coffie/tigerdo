@@ -12,6 +12,7 @@ const firebaseConfig = {
   appId: "1:208387163535:android:a27fc3bf1f0ddde52977fa"
 };
 
+// @ts-ignore
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

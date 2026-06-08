@@ -22,6 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaGuard } from "@/components/ui/safe-area-guard";
 import { auth, db } from "../../firebaseConfig";
 
 interface Person {
@@ -227,8 +228,9 @@ export default function Authorize() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Authorize People or Cars</Text>
+    <SafeAreaGuard style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.header}>Authorize People or Cars</Text>
       <Text style={styles.subHeader}>
         Only these people or cars can enter the premises.
       </Text>
@@ -407,7 +409,8 @@ export default function Authorize() {
           </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </SafeAreaGuard>
   );
 }
 
@@ -415,6 +418,10 @@ export default function Authorize() {
           STYLES
 ================================ */
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F7F7F7",
+  },
   container: {
     flex: 1,
     padding: 20,

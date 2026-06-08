@@ -6,7 +6,6 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
-  orderBy,
   query,
   serverTimestamp,
   where,
@@ -23,6 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaGuard } from "@/components/ui/safe-area-guard";
 import { auth, db } from "../../firebaseConfig";
 
 interface EmergencyContact {
@@ -62,15 +62,25 @@ export default function Emergency() {
 
     const q = query(
       collection(db, "emergencyContacts"),
-      where("uid", "==", user.uid),
-      orderBy("createdAt", "desc")
+      where("uid", "==", user.uid)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedContacts = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as EmergencyContact[];
+
+      // Sort by createdAt desc in memory to avoid needing a composite index
+      fetchedContacts.sort((a: any, b: any) => {
+        const timeA = a.createdAt?.toDate?.()?.getTime() || 0;
+        const timeB = b.createdAt?.toDate?.()?.getTime() || 0;
+        return timeB - timeA;
+      });
+
       setContacts(fetchedContacts);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching emergency contacts:", error);
       setLoading(false);
     });
 
@@ -252,8 +262,9 @@ export default function Emergency() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Emergency Contacts</Text>
+    <SafeAreaGuard style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.header}>Emergency Contacts</Text>
       <Text style={styles.subHeader}>
         Important contacts for emergency situations
       </Text>
@@ -359,21 +370,24 @@ export default function Emergency() {
           <View style={styles.modalContent}>
             <Text style={styles.modalHeader}>Add Emergency Contact</Text>
 
-            <TextInput
+             <TextInput
               style={styles.input}
               placeholder="Full Name *"
+              placeholderTextColor="#A0AEC0"
               value={name}
               onChangeText={setName}
             />
             <TextInput
               style={styles.input}
               placeholder="Position (e.g. Doctor, Police)"
+              placeholderTextColor="#A0AEC0"
               value={position}
               onChangeText={setPosition}
             />
             <TextInput
               style={styles.input}
               placeholder="Phone Number *"
+              placeholderTextColor="#A0AEC0"
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
@@ -381,6 +395,7 @@ export default function Emergency() {
             <TextInput
               style={styles.input}
               placeholder="Email Address"
+              placeholderTextColor="#A0AEC0"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -403,7 +418,8 @@ export default function Emergency() {
           </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </SafeAreaGuard>
   );
 }
 
@@ -411,6 +427,10 @@ export default function Emergency() {
           STYLES
 ================================ */
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#FFF5F5",
+  },
   container: {
     flex: 1,
     padding: 20,
